@@ -1,0 +1,9 @@
+node_modules/
+.next/
+out/
+coverage/
+.vercel/
+.env*
+!.env.example
+.zeenat-audit/
+npm-debug.log*
