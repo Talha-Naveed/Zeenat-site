@@ -18,12 +18,13 @@ export default function HomePage() {
       ]} />
         <section className="hero shell">
           <div className="hero-copy">
-            <p className="eyebrow"><span>v{VERSION}</span> TypeScript-first decoration engine</p>
+            <p className="eyebrow"><Link href="/changelog"><span>v{VERSION}</span></Link> Country flag bunting is here</p>
             <h1><span>Zeenat.js</span>Adorn the web.</h1>
             <p className="hero-lede">
               Add tasteful seasonal and occasion-aware decorations to an existing React,
               Next.js or vanilla JavaScript site with one component or function call.
             </p>
+            <p><Link href="/docs/flags" className="inline-doc-link">249 countries and territories. Horizontal or vertical flags. <ArrowRight size={14} /></Link></p>
             <div className="install-command">
               <Package size={17} aria-hidden="true" />
               <code>npm install zeenat</code>
@@ -45,7 +46,7 @@ export default function HomePage() {
             <HeroDemo />
             <div className="code-card" aria-label="React code example">
               <div className="code-card-head"><span>app/layout.tsx</span><span>React · Next.js</span></div>
-              <pre><code><span className="code-key">import</span> {`{ Zeenat }`} <span className="code-key">from</span> <span className="code-string">&quot;zeenat&quot;</span>;{"\n\n"}&lt;<span className="code-tag">Zeenat</span> preset=<span className="code-string">&quot;winter&quot;</span> /&gt;</code></pre>
+              <pre><code><span className="code-key">import</span> {`{ Zeenat }`} <span className="code-key">from</span> <span className="code-string">&quot;zeenat&quot;</span>;{"\n\n"}&lt;<span className="code-tag">Zeenat</span>{"\n  "}preset=<span className="code-string">&quot;bunting&quot;</span>{"\n  "}flag=<span className="code-string">&quot;pakistan&quot;</span>{"\n"}/&gt;</code></pre>
             </div>
           </div>
         </section>
@@ -62,8 +63,8 @@ export default function HomePage() {
           </div>
         </section>
         <section className="home-section shell presets-section">
-          <div className="section-heading split-heading"><div><p className="eyebrow">Built-in presets</p><h2>Effects compose. Presets give them meaning.</h2></div><p>An Effect is one neutral visual primitive. A Preset combines effects for a season or occasion, while typed factories keep advanced customization explicit.</p></div>
-          <div className="preset-strip">{presets.map((preset) => <Link href={`/docs/presets/${preset.slug}`} key={preset.slug} className="preset-tile"><LiveDemo compact preset={preset.slug as never} label={preset.title} /><div><span>{preset.occasion}</span><h3>{preset.title}</h3><small>{preset.effects.map((effect) => effect.replaceAll("-", " ")).join(" · ")}</small></div></Link>)}</div>
+          <div className="section-heading split-heading"><div><p className="eyebrow">Eight built-in presets</p><h2>Effects compose. Presets give them meaning.</h2></div><p>Hang country flags for any occasion, celebrate a national day or choose a seasonal composition. Typed factories expose the options each preset supports.</p></div>
+          <div className="preset-strip">{presets.map((preset) => <Link href={`/docs/presets/${preset.slug}`} key={preset.slug} className="preset-tile"><LiveDemo compact preset={preset.slug} label={preset.title} /><div><span>{preset.occasion}</span><h3>{preset.title}</h3><small>{preset.effects.map((effect) => effect.replaceAll("-", " ")).join(" · ")}</small></div></Link>)}</div>
           <div className="section-cta"><Link href="/docs/presets" className="button secondary">Compare all presets <ArrowRight size={16} /></Link></div>
         </section>
         <section className="home-section engineering-section">

@@ -8,7 +8,7 @@ const sitemapText = await sitemapResponse.text();
 const canonicalUrls = [...sitemapText.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
 const canonicalPaths = new Set(canonicalUrls.map((url) => new URL(url).pathname));
 
-if (canonicalUrls.length !== 44) failures.push(`Expected 44 sitemap URLs, found ${canonicalUrls.length}.`);
+if (canonicalUrls.length !== 47) failures.push(`Expected 47 sitemap URLs, found ${canonicalUrls.length}.`);
 
 const pages = await Promise.all(canonicalUrls.map(async (canonicalUrl) => {
   const path = new URL(canonicalUrl).pathname;

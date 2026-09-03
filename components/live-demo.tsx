@@ -22,10 +22,11 @@ import {
   sparkles,
   stringLights,
 } from "zeenat/effects";
+import { pakistanFlag, unitedStatesFlag } from "zeenat/effects/bunting";
 
 const effectScenes: Record<string, readonly ZeenatEffect[]> = {
   aircraft: [aircraft({ colors: ["#dbe8e2", "#789f95"], count: 2 })],
-  bunting: [bunting({ colors: ["#df745d", "#f7f3e8", "#d9aa55"], count: 12 })],
+  bunting: [bunting({ flags: [pakistanFlag, unitedStatesFlag], count: 12 })],
   "falling-leaves": [fallingLeaves({ count: 16 })],
   fireworks: [fireworks({ colors: ["#df745d", "#f5d08a", "#79a9be"], count: 2 })],
   lanterns: [lanterns({ count: 5, colors: ["#d97706", "#df745d", "#f5d08a"] })],
@@ -73,7 +74,7 @@ export function LiveDemo({
   return (
     <div ref={containerRef} className={compact ? "embedded-demo compact" : "embedded-demo"} aria-label={`${label} live preview`}>
       {visible && (preset ? (
-        <Zeenat key={instance} ref={sceneRef} preset={preset} intensity={intensity} motion={motion} seed={2468} zIndex={1} />
+        <Zeenat key={instance} ref={sceneRef} preset={preset} {...(preset === "bunting" ? { flag: "pakistan" as const } : {})} intensity={intensity} motion={motion} seed={2468} zIndex={1} />
       ) : effects ? (
         <ZeenatScene key={instance} ref={sceneRef} effects={effects} id={`demo-${effect}`} name={`${label} demo`} intensity={intensity} motion={motion} seed={2468} zIndex={1} />
       ) : null)}

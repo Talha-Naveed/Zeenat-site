@@ -12,7 +12,7 @@ export const metadata: Metadata = pageMetadata({
 const cards = [
   { icon: BookOpen, title: "Getting started", copy: "Install Zeenat and render your first preset.", href: "/docs/getting-started" },
   { icon: Flower2, title: "Effects", copy: "Nine reusable visual primitives with complete option tables.", href: "/docs/effects" },
-  { icon: Boxes, title: "Presets", copy: "Six built-in seasonal and occasion-aware compositions.", href: "/docs/presets" },
+  { icon: Boxes, title: "Presets", copy: "Eight compositions for country flags, national days, seasons and celebrations.", href: "/docs/presets" },
   { icon: Laptop, title: "Framework guides", copy: "React, Next.js App Router and vanilla JavaScript.", href: "/docs/react" },
   { icon: Braces, title: "Customization", copy: "Typed preset factories, custom effects and compositions.", href: "/docs/customization" },
   { icon: Gauge, title: "Engineering", copy: "Accessibility, performance, CSP and diagnostics.", href: "/docs/performance" },

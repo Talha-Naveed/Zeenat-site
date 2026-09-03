@@ -1,4 +1,4 @@
-import { docArticles, effects, GITHUB_URL, guides, NPM_URL, presets, SITE_URL } from "@/lib/content";
+import { docArticles, effects, GITHUB_URL, guides, NPM_URL, presets, SITE_URL, VERSION } from "@/lib/content";
 
 export const dynamic = "force-static";
 
@@ -11,6 +11,7 @@ export function GET() {
     `Canonical: ${SITE_URL}`,
     `Source: ${GITHUB_URL}`,
     `npm: ${NPM_URL}`,
+    `Version: ${VERSION}`,
     "Install: npm install zeenat",
     "",
     "## Documentation",

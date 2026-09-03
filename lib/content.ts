@@ -1,7 +1,10 @@
+import type { BuiltInPresetName } from "zeenat";
+import zeenatPackage from "zeenat/package.json";
+
 export const SITE_URL = "https://zeenat.xinuty.com";
 export const GITHUB_URL = "https://github.com/Talha-Naveed/Zeenat";
 export const NPM_URL = "https://www.npmjs.com/package/zeenat";
-export const VERSION = "0.2.1";
+export const VERSION = zeenatPackage.version;
 
 export type ApiOption = {
   name: string;
@@ -52,35 +55,37 @@ export const effects: readonly EffectDoc[] = [
     slug: "bunting",
     exportName: "bunting",
     title: "Bunting",
-    summary: "Responsive SVG cable and pennants for celebrations, launches and event pages.",
-    description: "The Zeenat bunting effect hangs a responsive SVG cable and a bounded row of pennants along the top or bottom of a website. It remains static when reduced motion is active and never captures pointer input.",
+    summary: "Responsive country flags or classic pennants, anchored to a curved SVG cord.",
+    description: "Hang country flags, custom flag artwork or classic pennants along the top or bottom of a website. Bunting follows the cord in viewport pixels, keeps each item tangent to the curve and preserves flag proportions as the screen resizes.",
     defaultLayer: "top",
     colors: ["#0d3b35", "#f7f3e8", "#df745d"],
     options: [
-      { name: "colors", type: "readonly string[]", required: true, default: "required", description: "One or more CSS colors, cycled across the pennants." },
-      { name: "count", type: "number", default: "14", description: "Base pennant count before intensity and viewport scaling." },
+      { name: "colors", type: "readonly string[]", default: "required in pennant mode", description: "Solid pennant colors. Choose colors or flags; they cannot be combined." },
+      { name: "flags", type: "readonly BuntingFlagDesign[]", default: "required in flag mode", description: "Reusable country or custom flag designs. Cannot be combined with colors or shape." },
+      { name: "orientation", type: '"horizontal" | "vertical"', default: '"horizontal"', description: "Flag mode only. Vertical rotates the complete artwork 90° clockwise without stretching it." },
+      { name: "count", type: "number", default: "14", description: "Base item count before intensity and viewport scaling." },
       { name: "position", type: '"top" | "bottom"', default: '"top"', description: "Edge of the viewport used for the cable." },
       { name: "height", type: "number", default: "74 small / 108 large", description: "Rendered SVG height in CSS pixels." },
-      { name: "shape", type: '"pennant" | "swallowtail"', default: '"pennant"', description: "Flag silhouette." },
+      { name: "shape", type: '"pennant" | "swallowtail"', default: '"pennant"', description: "Classic pennant mode only; unavailable when flags is supplied." },
       { name: "cableColor", type: "string", default: '"rgba(30, 35, 40, 0.68)"', description: "CSS color used for the cable." },
       ...placementOptions("top"),
     ],
     reducedMotion: "All flags remain visible as a quiet static composition; their subtle alternating sway is omitted.",
-    performance: "Uses one responsive SVG with a bounded number of paths. Counts scale down on small screens and at low intensity.",
+    performance: "Flag artwork is drawn once per design into an SVG symbol and reused along the cord. Catalog geometry loads on demand from local package chunks. Aborted or replaced scenes ignore late loads, and rejected loads are handled without an unhandled rejection.",
     related: ["sparkles", "string-lights", "aircraft"],
     examples: [
-      { label: "Basic", filename: "Decoration.tsx", code: basicEffectExample("bunting", '{ colors: ["#0d3b35", "#f7f3e8"] }') },
-      { label: "Subtle", code: 'bunting({ colors: ["#173f5f", "#f8fafc"], count: 8, height: 72 })', language: "ts" },
-      { label: "Intense", code: 'bunting({ colors: ["#dc2626", "#f8fafc", "#2563eb"], count: 22, shape: "swallowtail" })', language: "ts" },
-      { label: "Combined", code: 'const effects = [\n  sparkles({ colors: ["#fbbf24"], count: 10 }),\n  bunting({ colors: ["#0f766e", "#f8fafc"] }),\n];', language: "ts" },
+      { label: "Basic", filename: "Decoration.tsx", code: 'import { ZeenatScene } from "zeenat";\nimport { bunting, pakistanFlag } from "zeenat/effects/bunting";\n\nconst effects = [bunting({ flags: [pakistanFlag], count: 14 })];\n\nexport function Decoration() {\n  return <ZeenatScene effects={effects} />;\n}' },
+      { label: "Country flags and orientation", code: 'import { bunting } from "zeenat/effects/bunting";\nimport { countryFlag } from "zeenat/flags";\n\nconst flags = bunting({\n  flags: [countryFlag("PK"), countryFlag("japan")],\n  orientation: "vertical",\n  count: 12,\n});', language: "ts" },
+      { label: "Classic pennants", code: 'import { bunting } from "zeenat/effects/bunting";\n\nconst pennants = bunting({ colors: ["#173f5f", "#f8fafc"], count: 8 });\nconst swallowtails = bunting({\n  colors: ["#dc2626", "#f8fafc", "#2563eb"],\n  shape: "swallowtail",\n});', language: "ts" },
+      { label: "Combined", code: 'import { bunting, sparkles } from "zeenat/effects";\nimport { unitedStatesFlag } from "zeenat/effects/bunting";\n\nconst effects = [\n  sparkles({ colors: ["#fbbf24"], count: 10 }),\n  bunting({ flags: [unitedStatesFlag] }),\n];', language: "ts" },
     ],
   },
   {
     slug: "aircraft",
     exportName: "aircraft",
     title: "Aircraft",
-    summary: "An original SVG aircraft silhouette with a restrained, configurable flyover.",
-    description: "The Zeenat aircraft effect sends original, generic SVG silhouettes across a foreground layer. It is suitable for restrained flyover compositions and contains no logos, emblems or remote image assets.",
+    summary: "Original fighter-jet silhouettes with a restrained, configurable flyover.",
+    description: "The Zeenat aircraft effect sends original SVG fighter jets across a foreground layer, oriented in their direction of travel. Pakistan Defence Day uses a right-to-left flyover. Flight endpoints follow viewport resizing, including changes within the same breakpoint.",
     defaultLayer: "foreground",
     colors: ["#40566d", "#d9e4ec"],
     options: [
@@ -290,41 +295,83 @@ export const effects: readonly EffectDoc[] = [
 ];
 
 export type PresetDoc = {
-  slug: string;
+  slug: BuiltInPresetName;
   title: string;
   summary: string;
   description: string;
   occasion: string;
   effects: readonly string[];
   colors: readonly string[];
-  factory?: string;
+  factory: string;
+  factoryExample?: string;
+  schedule?: readonly [string, string];
   factoryOptions: readonly ApiOption[];
   reducedMotion: string;
   related: readonly string[];
 };
 
+const orientationOption: ApiOption = { name: "orientation", type: '"horizontal" | "vertical"', default: '"horizontal"', description: "Rotate flag artwork 90° clockwise for vertical hanging, preserving its proportions." };
+
 export const presets: readonly PresetDoc[] = [
+  {
+    slug: "bunting",
+    title: "Country Flag Bunting",
+    summary: "A responsive cord of country flags for any occasion, with no additional effects.",
+    description: "Choose an English country slug or two-letter code from the locally packaged 249-entry catalog. The bunting preset requires flag, supports horizontal or vertical artwork and works independently of a national day or season.",
+    occasion: "Any occasion",
+    effects: ["bunting"],
+    colors: ["#01411c", "#ffffff"],
+    factory: "createBuntingPreset",
+    factoryExample: 'flag: "PK",\n  orientation: "vertical"',
+    factoryOptions: [
+      { name: "flag", type: "CountryFlag", required: true, default: "required", description: "Country slug such as pakistan or a code such as PK or JP from zeenat/flags." },
+      orientationOption,
+    ],
+    reducedMotion: "The flag cord stays visible with its sway disabled.",
+    related: ["pakistan-independence-day", "pakistan-defence-day", "us-independence-day"],
+  },
+  {
+    slug: "pakistan-independence-day",
+    title: "Pakistan Independence Day",
+    summary: "Pakistani flag bunting, green-and-white star accents and modest fireworks for 14 August.",
+    description: "Celebrate Pakistan Independence Day on 14 August with reusable Pakistani flag artwork and restrained green-and-white effects. The preset combines flag bunting, star-shaped sparkles and small background fireworks.",
+    occasion: "14 August · Pakistan",
+    effects: ["sparkles", "fireworks", "bunting"],
+    colors: ["#01411c", "#ffffff"],
+    factory: "createPakistanIndependenceDayPreset",
+    factoryExample: 'orientation: "vertical"',
+    factoryOptions: [orientationOption],
+    schedule: ["2026-08-14T00:00:00+05:00", "2026-08-15T00:00:00+05:00"],
+    reducedMotion: "Fireworks are omitted; static Pakistani flags and sparse star accents remain.",
+    related: ["bunting", "pakistan-defence-day", "us-independence-day"],
+  },
   {
     slug: "pakistan-defence-day",
     title: "Pakistan Defence Day",
-    summary: "Green and white bunting, subtle accents and a restrained generic aircraft flyover.",
-    description: "A national-day composition for Pakistan Defence Day. The preset uses original geometry and culturally restrained green-and-white decoration without copied emblems.",
-    occasion: "Defence Day · Pakistan",
+    summary: "Pakistani flag bunting, subtle accents and correctly oriented fighter jets flying right to left.",
+    description: "A restrained composition for Pakistan Defence Day on 6 September, with reusable Pakistani flag artwork, green-and-white accents and an original right-to-left fighter-jet flyover.",
+    occasion: "6 September · Pakistan",
     effects: ["sparkles", "aircraft", "bunting"],
     colors: ["#01411c", "#ffffff", "#315f4b"],
-    factoryOptions: [],
+    factory: "createPakistanDefenceDayPreset",
+    factoryExample: 'orientation: "vertical"',
+    factoryOptions: [orientationOption],
+    schedule: ["2026-09-06T00:00:00+05:00", "2026-09-07T00:00:00+05:00"],
     reducedMotion: "Aircraft are omitted; static bunting and sparse sparkle accents remain.",
-    related: ["us-independence-day", "festive-lights"],
+    related: ["pakistan-independence-day", "bunting", "us-independence-day"],
   },
   {
     slug: "us-independence-day",
     title: "US Independence Day",
-    summary: "Red, white and blue bunting with star accents and modest fireworks.",
-    description: "A national-day composition for United States Independence Day, combining a swallowtail bunting cable with star-shaped sparkles and small background fireworks.",
-    occasion: "Independence Day · United States",
+    summary: "American flag bunting with star accents and modest fireworks.",
+    description: "A national-day composition for United States Independence Day on 4 July, combining reusable American flag artwork with star-shaped sparkles and small background fireworks.",
+    occasion: "4 July · United States",
     effects: ["sparkles", "fireworks", "bunting"],
     colors: ["#b22234", "#ffffff", "#3c3b6e"],
-    factoryOptions: [],
+    factory: "createUsIndependenceDayPreset",
+    factoryExample: 'orientation: "vertical"',
+    factoryOptions: [orientationOption],
+    schedule: ["2026-07-04T00:00:00-04:00", "2026-07-05T00:00:00-04:00"],
     reducedMotion: "Fireworks are omitted; static bunting and sparse star accents remain.",
     related: ["pakistan-defence-day", "festive-lights"],
   },
@@ -434,7 +481,7 @@ export const docArticles: readonly ArticleDoc[] = [
     eyebrow: "Start here",
     sections: [
       { id: "install", title: "Install Zeenat", paragraphs: ["Zeenat requires Node.js 20.19 or newer for its development toolchain. React and React DOM are peer dependencies; the framework-neutral engine has zero runtime dependencies."], code: { label: "Install", language: "bash", code: "npm install zeenat" } },
-      { id: "first-decoration", title: "Render a preset", paragraphs: ["Pass one of the six verified built-in preset IDs to the React component. The scene is decorative, fixed, pointer-inert and cleaned up automatically when it unmounts."], code: { label: "React", filename: "App.tsx", code: 'import { Zeenat } from "zeenat";\n\nexport function App() {\n  return <Zeenat preset="winter" />;\n}' } },
+      { id: "first-decoration", title: "Render a preset", paragraphs: ["Choose one of eight built-in preset IDs. Country Flag Bunting also requires a flag; the other seven are ready-to-use seasonal or national-day compositions. Every scene is decorative, fixed, pointer-inert and cleaned up automatically when it unmounts."], code: { label: "React", filename: "App.tsx", code: 'import { Zeenat } from "zeenat";\n\nexport function App() {\n  return <Zeenat preset="bunting" flag="pakistan" />;\n}' } },
       { id: "control", title: "Choose intensity and duration", paragraphs: ["Intensity scales effect density. Duration is infinite by default; provide milliseconds for a finite scene. The seed stabilizes generated positions and timing."], code: { label: "Options", filename: "App.tsx", code: '<Zeenat\n  preset="spring"\n  intensity="low"\n  duration={8_000}\n  seed={2026}\n/>' } },
       { id: "next", title: "Choose your integration", paragraphs: ["Continue with the integration guide for your framework or open the playground to explore presets, individual effects and lifecycle controls."], links: [{ label: "React", href: "/docs/react" }, { label: "Next.js App Router", href: "/docs/nextjs" }, { label: "Vanilla JavaScript", href: "/docs/vanilla" }, { label: "Open playground", href: "/playground" }] },
     ],
@@ -445,9 +492,10 @@ export const docArticles: readonly ArticleDoc[] = [
     description: "Package requirements, imports, ESM and CJS output, React peer dependencies and supported Zeenat.js subpath exports.",
     eyebrow: "Setup",
     sections: [
-      { id: "package", title: "Install the package", paragraphs: ["The npm package name is zeenat. Version 0.2.1 ships ESM, CommonJS, declarations and sourcemaps."], code: { label: "npm", language: "bash", code: "npm install zeenat" } },
+      { id: "package", title: "Install the package", paragraphs: [`The npm package name is zeenat. Version ${VERSION} ships ESM, CommonJS, declarations and sourcemaps. Optional flag geometry is split into on-demand chunks in both builds; keep the complete package output when deploying.`], code: { label: "npm", language: "bash", code: "npm install zeenat" } },
       { id: "entry-points", title: "Choose the smallest entry point", paragraphs: ["The main entry exports React adapters and core definitions. Framework-neutral consumers can use zeenat/core or zeenat/vanilla. Effects and configurable presets have aggregate and individual subpath exports for tree shaking."], code: { label: "Imports", language: "ts", code: 'import { Zeenat } from "zeenat";\nimport { zeenat } from "zeenat/vanilla";\nimport { snow } from "zeenat/effects/snow";\nimport { createWinterPreset } from "zeenat/presets/winter";' } },
       { id: "peers", title: "React peer dependencies", paragraphs: ["React 18.2 or newer is supported. React DOM is an optional peer for framework integration, while framework-neutral entries do not depend on React at runtime."] },
+      { id: "flags", title: "Optional country flags", paragraphs: ["zeenat/flags exports flagCatalog, resolveFlag and countryFlag. Country metadata is synchronous; selected artwork loads from local package chunks when a flag scene mounts."], code: { label: "Flag imports", language: "ts", code: 'import { flagCatalog, countryFlag, resolveFlag } from "zeenat/flags";\nimport { createBuntingPreset } from "zeenat/presets/bunting";' }, links: [{ label: "Country flags and custom artwork", href: "/docs/flags" }] },
     ],
   },
   {
@@ -484,12 +532,28 @@ export const docArticles: readonly ArticleDoc[] = [
     ],
   },
   {
+    slug: "flags",
+    title: "Country flags and custom artwork",
+    description: "Use Zeenat's 249-entry country flag catalog, horizontal or vertical bunting, reusable flag designs and custom SVG artwork contracts.",
+    eyebrow: "New in 0.3.0",
+    sections: [
+      { id: "simple", title: "Flags for any occasion", paragraphs: ["Use preset=\"bunting\" with a country flag to hang flags without fireworks, sparkles or an occasion-specific composition. The flag option accepts English slugs such as pakistan or japan and case-insensitive two-letter codes such as PK or JP."], code: { label: "React / Next.js", code: 'import { Zeenat } from "zeenat";\n\n<Zeenat preset="bunting" flag="pakistan" />;\n<Zeenat preset="bunting" flag="JP" orientation="vertical" />;' } },
+      { id: "vanilla", title: "Vanilla JavaScript", paragraphs: ["The framework-neutral API uses the same flag and orientation options. Destroy the decoration when its hosting view is removed."], code: { label: "Vanilla", language: "ts", code: 'import { zeenat } from "zeenat/vanilla";\n\nconst decoration = zeenat({\n  preset: "bunting",\n  flag: "pakistan",\n  orientation: "vertical",\n});\n\n// When the view is removed:\ndecoration.destroy();' } },
+      { id: "catalog", title: "The packaged country catalog", paragraphs: ["flagCatalog contains 249 country and territory entries, each with code, name and slug. The catalog excludes IL and includes XK. Use these entries as the source for a country picker; unsupported names and codes are rejected.", "resolveFlag resolves a supported name or code to metadata. countryFlag returns a reusable design synchronously, without browser globals; its optional geometry is loaded only when mounted. The playground's country selector uses this same catalog."], code: { label: "Catalog helpers", language: "ts", code: 'import { flagCatalog, resolveFlag, countryFlag } from "zeenat/flags";\n\nconst countries = flagCatalog; // { code, name, slug }[]\nconst japan = resolveFlag("JP");\nconst japanArtwork = countryFlag("japan");' }, links: [{ label: "Try the country picker", href: "/playground" }, { label: "Full country catalog", href: `${GITHUB_URL}/blob/v0.3.0/docs/flags-catalog.md` }] },
+      { id: "orientation", title: "Horizontal and vertical flags", paragraphs: ["Horizontal is the default. Vertical rotates the complete artwork 90° clockwise without stretching it; country-specific ceremonial vertical variants are not represented. Items remain tangent to the curved cord and keep their proportions when the viewport resizes.", "The simple API supports orientation on bunting, pakistan-independence-day, pakistan-defence-day and us-independence-day. Their typed factories expose orientation too. Set flag only on the generic bunting preset."], code: { label: "Typed preset", language: "ts", code: 'import { createBuntingPreset } from "zeenat/presets/bunting";\nimport { createPakistanIndependenceDayPreset } from "zeenat/presets/pakistan-independence-day";\n\nconst japan = createBuntingPreset({ flag: "JP", orientation: "vertical" });\nconst independenceDay = createPakistanIndependenceDayPreset({\n  orientation: "vertical",\n});' } },
+      { id: "primitive", title: "Reusable designs and mixed flags", paragraphs: ["pakistanFlag and unitedStatesFlag are original reusable designs exported by zeenat/effects/bunting. Pass one or more designs through flags to repeat them along a cord. Use countryFlag for any supported catalog entry.", "BuntingOptions is a union: flag mode takes flags and optional orientation; classic pennant mode takes colors and optional shape. Do not combine flags with colors or shape. Both modes support count, position, height, cableColor, layer and order."], code: { label: "Custom composition", language: "ts", code: 'import { bunting, pakistanFlag, unitedStatesFlag } from "zeenat/effects/bunting";\nimport { countryFlag } from "zeenat/flags";\n\nconst international = bunting({\n  flags: [pakistanFlag, unitedStatesFlag, countryFlag("JP")],\n  orientation: "horizontal",\n  count: 12,\n});\n\nconst classic = bunting({\n  colors: ["#01411c", "#ffffff"],\n  shape: "swallowtail",\n});' }, links: [{ label: "Complete bunting options", href: "/docs/effects/bunting" }] },
+      { id: "custom-artwork", title: "Custom flag artwork contracts", paragraphs: ["Import BuntingFlagDesign and BuntingFlagRenderContext from zeenat/effects/bunting. A design provides a stable id, an aspectRatio and a render function. Artwork is drawn into a normalized SVG symbol once and reused by the flags on the cord.", "Use the supplied document and container, keep SVG complexity bounded and prefix internal SVG IDs with container.id. The normalized viewBox is 0 0 width 1. If render awaits work, check signal.aborted before appending geometry. The owning effect aborts when removed, restarted or rebuilt across a breakpoint. Rejected renders mark the symbol as failed and are handled without an unhandled rejection."], code: { label: "Public contracts", language: "ts", code: 'interface BuntingFlagDesign {\n  readonly id: string;\n  readonly aspectRatio: number;\n  render(context: BuntingFlagRenderContext): void | Promise<void>;\n}\n\ninterface BuntingFlagRenderContext {\n  readonly document: Document;\n  readonly container: SVGSymbolElement;\n  readonly width: number;\n  readonly height: number;\n  readonly signal: AbortSignal;\n}' } },
+      { id: "loading-and-license", title: "Local loading and artwork licensing", paragraphs: ["Country metadata ships with the package. Optional artwork geometry is split into on-demand ESM and CJS chunks, so selecting a country does not eagerly load every flag. Keep the complete generated dist directory when deploying. No remote image host or flag runtime dependency is required.", "Pakistan and United States artwork is original CSS/SVG. Other artwork is adapted from the MIT-licensed country-flag-icons project. The package includes artwork licensing, and the source repository includes a reproducible development-only generator pinned to country-flag-icons@1.6.20."], links: [{ label: "Package source and licensing", href: `${GITHUB_URL}/tree/v0.3.0` }, { label: "Performance and loading", href: "/docs/performance" }] },
+    ],
+  },
+  {
     slug: "configuration",
     title: "Configuration reference",
     description: "Reference for Zeenat preset, intensity, duration, motion, scheduling, seed, z-index, enabled and diagnostics options.",
     eyebrow: "Reference",
     sections: [
-      { id: "options", title: "Scene options", paragraphs: ["React ZeenatProps extends ZeenatOptions and adds className. The vanilla adapter adds an optional mount target and className."], code: { label: "TypeScript", language: "ts", code: 'type ZeenatOptions = {\n  preset: BuiltInPresetName | ZeenatPreset;\n  intensity?: "low" | "medium" | "high"; // medium\n  duration?: number | "infinite"; // infinite\n  zIndex?: number; // 1000\n  respectReducedMotion?: boolean; // true\n  motion?: "system" | "full" | "reduced"; // system\n  enabled?: boolean; // true\n  seed?: number;\n  activeFrom?: string | Date;\n  activeUntil?: string | Date;\n  debug?: boolean; // false\n};' } },
+      { id: "options", title: "Scene options", paragraphs: ["React ZeenatProps extends ZeenatOptions and adds className. The vanilla adapter adds an optional mount target and className."], code: { label: "TypeScript", language: "ts", code: 'type ZeenatOptions = {\n  preset: BuiltInPresetName | ZeenatPreset;\n  flag?: CountryFlag; // required for preset="bunting" only\n  orientation?: "horizontal" | "vertical"; // flag-bunting presets only\n  intensity?: "low" | "medium" | "high"; // medium\n  duration?: number | "infinite"; // infinite\n  zIndex?: number; // 1000\n  respectReducedMotion?: boolean; // true\n  motion?: "system" | "full" | "reduced"; // system\n  enabled?: boolean; // true\n  seed?: number;\n  activeFrom?: string | Date;\n  activeUntil?: string | Date;\n  debug?: boolean; // false\n};' } },
+      { id: "flags", title: "Flag and orientation", paragraphs: ["flag is required for the bunting string preset and invalid on other presets. orientation defaults to horizontal and is accepted by bunting, pakistan-independence-day, pakistan-defence-day and us-independence-day. For a custom preset object, configure orientation inside its factory or bunting effect instead of passing it at the scene level."], code: { label: "Flag options", code: '<Zeenat preset="bunting" flag="JP" orientation="vertical" />;\n<Zeenat preset="pakistan-independence-day" orientation="horizontal" />;' }, links: [{ label: "Country flags", href: "/docs/flags" }] },
       { id: "seed", title: "Deterministic seed", paragraphs: ["A normalized scene seed derives one stable random stream for every preset effect index. Restarting with the same seed replays the same generated geometry."] },
       { id: "motion", title: "Motion override", paragraphs: ["Use system for normal applications. full and reduced are explicit overrides intended for user-controlled motion settings and preview tools. respectReducedMotion is true by default."] },
       { id: "z-index", title: "Host z-index", paragraphs: ["zIndex controls the root's relationship with the host application. Individual effects use background, ambient, foreground and top bands inside that root and cannot escape the scene."] },
@@ -513,7 +577,7 @@ export const docArticles: readonly ArticleDoc[] = [
     eyebrow: "Customization",
     sections: [
       { id: "simple", title: "Start with scene-level controls", paragraphs: ["Intensity adjusts density across the scene, while seed stabilizes geometry. These options are the smallest way to tune a built-in preset."], code: { label: "Scene options", code: '<Zeenat preset="winter" intensity="low" seed={42} />' } },
-      { id: "factory", title: "Use a typed preset factory", paragraphs: ["Winter, Autumn, Spring and Festive Lights export typed factories. Each factory accepts settings for its own effect composition, including false to remove a layer."], code: { label: "Typed factory", filename: "Decoration.tsx", code: 'import { Zeenat } from "zeenat";\nimport { createWinterPreset } from "zeenat/presets/winter";\n\nconst quietWinter = createWinterPreset({\n  snow: { count: 14, speed: "slow", drift: 20 },\n  sparkles: false,\n});\n\nexport function Decoration() {\n  return <Zeenat preset={quietWinter} />;\n}' } },
+      { id: "factory", title: "Use a typed preset factory", paragraphs: ["All eight preset IDs have typed factories. Winter, Autumn, Spring and Festive Lights let you configure or disable individual layers. The three national-day factories accept orientation; createBuntingPreset requires flag and optionally accepts orientation."], code: { label: "Typed factory", filename: "Decoration.tsx", code: 'import { Zeenat } from "zeenat";\nimport { createWinterPreset } from "zeenat/presets/winter";\n\nconst quietWinter = createWinterPreset({\n  snow: { count: 14, speed: "slow", drift: 20 },\n  sparkles: false,\n});\n\nexport function Decoration() {\n  return <Zeenat preset={quietWinter} />;\n}' } },
       { id: "compose", title: "Compose your own preset", paragraphs: ["For brand events and campaigns, define a named preset from individually imported effects. This keeps reusable visual primitives separate from occasion meaning."], links: [{ label: "Custom preset guide", href: "/docs/custom-presets" }, { label: "Build a custom Zeenat preset", href: "/guides/build-custom-zeenat-preset" }] },
     ],
   },
@@ -560,6 +624,7 @@ export const docArticles: readonly ArticleDoc[] = [
       { id: "scheduler", title: "One scheduler, isolated scopes", paragraphs: ["One scene scheduler multiplexes RAF work and pause-aware timers. Every effect has a scoped scheduler, animation registry, abort signal and cleanup ownership, so a failing effect rolls back without stopping healthy siblings."] },
       { id: "visibility", title: "Responsive density and visibility pausing", paragraphs: ["Counts scale by intensity, small-screen status and motion preference. Visibility changes pause scheduler work, and crossing the small-screen breakpoint rebuilds with the same deterministic seed."] },
       { id: "bundles", title: "Tree shaking and package budgets", paragraphs: ["The package has zero runtime dependencies, marks sideEffects false, keeps React as a peer and ships aggregate plus individual effect and preset subpaths. Automated gzip ceilings cover the React, vanilla, core, catalog and individual effect entries."] },
+      { id: "flag-chunks", title: "Load only selected flag artwork", paragraphs: ["The 249-entry country catalog is packaged locally. Its optional artwork index and selected SVG geometry load on demand in both ESM and CJS builds. Server-rendered, disabled and future-scheduled scenes request no flag geometry. Preserve the entire generated dist directory so dynamic imports remain available.", "Late flag loads cannot repopulate destroyed or replaced scenes. Rejected renders are handled by the effect. Bunting recomputes cord positions, tangents and flag proportions in viewport pixels on resize; aircraft flight endpoints also update within the same breakpoint."] },
     ],
   },
   {
@@ -568,7 +633,7 @@ export const docArticles: readonly ArticleDoc[] = [
     description: "Use Zeenat.js under a strict CSP without unsafe-eval, injected style sheets, remote assets or data URLs.",
     eyebrow: "Security",
     sections: [
-      { id: "runtime", title: "CSP-friendly runtime", paragraphs: ["Zeenat.js v0.2 uses no eval, generated style elements, inline script, remote assets or data URLs. Effects create DOM and SVG nodes, set element style properties and use the Web Animations API. A nonce prop is unnecessary because the library injects no style or script element."], code: { label: "Representative policy", language: "bash", code: "default-src 'self';\nscript-src 'self';\nstyle-src 'self';\nimg-src 'self';\nconnect-src 'self' ws:;\nfont-src 'self';\nobject-src 'none';\nbase-uri 'none'" } },
+      { id: "runtime", title: "CSP-friendly runtime", paragraphs: ["Zeenat.js uses no eval, generated style elements, inline script, remote assets or data URLs. Effects create DOM and SVG nodes, set element style properties and use the Web Animations API. Optional flag chunks are served with your application, so allow their origin in your script policy. A nonce prop is unnecessary because the library injects no style or script element."], code: { label: "Representative policy", language: "bash", code: "default-src 'self';\nscript-src 'self';\nstyle-src 'self';\nimg-src 'self';\nconnect-src 'self' ws:;\nfont-src 'self';\nobject-src 'none';\nbase-uri 'none'" } },
       { id: "custom", title: "Custom effect responsibility", paragraphs: ["Custom effects preserve this behavior only when they avoid injected stylesheets, inline scripts, eval, data URLs and remote assets. Prefer element style properties, SVG attributes and registered Web Animations."] },
     ],
   },
@@ -602,7 +667,8 @@ export const docArticles: readonly ArticleDoc[] = [
       { id: "react", title: "React exports", paragraphs: ["The zeenat entry exports Zeenat, ZeenatScene, ZeenatHandle, ZeenatProps and ZeenatSceneProps. It also re-exports core definition, validation and public engine types."], links: [{ label: "React usage", href: "/docs/react" }, { label: "Configuration reference", href: "/docs/configuration" }] },
       { id: "controller", title: "Controller", paragraphs: ["ZeenatController exposes state plus pause(), resume(), restart(), destroy(), setIntensity(), getDiagnostics() and subscribeDiagnostics(). destroy() is idempotent."] },
       { id: "core", title: "Core authoring exports", paragraphs: ["zeenat/core exports defineEffect, definePreset, preset validation functions and framework-neutral authoring types including EffectContext, ZeenatEffect, ZeenatPreset, ZeenatScheduler and ZeenatLayer."] },
-      { id: "catalogs", title: "Effects and presets", paragraphs: ["zeenat/effects exports all nine neutral effect factories and their option types. zeenat/presets exports all six built-in preset objects, the registry, resolver and typed factories for Winter, Autumn, Spring and Festive Lights."], links: [{ label: "Effect API pages", href: "/docs/effects" }, { label: "Preset API pages", href: "/docs/presets" }] },
+      { id: "catalogs", title: "Effects and presets", paragraphs: ["zeenat/effects exports all nine neutral effect factories and their option types. zeenat/presets exports seven ready-to-use preset objects, the registry, resolver and eight typed factories. The configurable bunting ID requires flag and is resolved separately from builtInPresets through createBuntingPreset."], links: [{ label: "Effect API pages", href: "/docs/effects" }, { label: "Preset API pages", href: "/docs/presets" }] },
+      { id: "flags", title: "Country catalog and artwork contracts", paragraphs: ["zeenat/flags exports flagCatalog, resolveFlag, countryFlag, CountryFlag, CountryFlagCode and CountryFlagName. zeenat/effects/bunting exports pakistanFlag, unitedStatesFlag, BuntingFlagDesign, BuntingFlagRenderContext, FlagOrientation, FlagBuntingOptions and PennantBuntingOptions."], links: [{ label: "Country flags and custom artwork", href: "/docs/flags" }] },
     ],
   },
 ];
@@ -669,7 +735,7 @@ export const guides: readonly GuideDoc[] = [
 export const docsNav = [
   { title: "Overview", items: [["What is Zeenat?", "/docs/what-is-zeenat"], ["Getting started", "/docs/getting-started"], ["Installation", "/docs/installation"]] },
   { title: "Integrations", items: [["React", "/docs/react"], ["Next.js", "/docs/nextjs"], ["Vanilla JavaScript", "/docs/vanilla"]] },
-  { title: "Reference", items: [["Configuration", "/docs/configuration"], ["Scheduling", "/docs/scheduling"], ["Effects", "/docs/effects"], ["Presets", "/docs/presets"], ["API", "/docs/api"]] },
+  { title: "Reference", items: [["Configuration", "/docs/configuration"], ["Scheduling", "/docs/scheduling"], ["Effects", "/docs/effects"], ["Presets", "/docs/presets"], ["Country flags", "/docs/flags"], ["API", "/docs/api"]] },
   { title: "Authoring", items: [["Customization", "/docs/customization"], ["Custom effects", "/docs/custom-effects"], ["Custom presets", "/docs/custom-presets"]] },
   { title: "Engineering", items: [["Accessibility", "/docs/accessibility"], ["Performance", "/docs/performance"], ["CSP", "/docs/csp"], ["Browser support", "/docs/browser-support"], ["Diagnostics", "/docs/diagnostics"]] },
 ] as const;

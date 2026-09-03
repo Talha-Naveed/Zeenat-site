@@ -17,7 +17,7 @@ describe("source-driven content registry", () => {
       "bunting", "aircraft", "sparkles", "fireworks", "snow", "petals", "falling-leaves", "lanterns", "string-lights",
     ]);
     expect(presets.map((preset) => preset.slug)).toEqual([
-      "pakistan-defence-day", "us-independence-day", "winter", "autumn", "spring", "festive-lights",
+      "bunting", "pakistan-independence-day", "pakistan-defence-day", "us-independence-day", "winter", "autumn", "spring", "festive-lights",
     ]);
     for (const effect of effects) {
       expect(effect.options.length).toBeGreaterThan(3);
