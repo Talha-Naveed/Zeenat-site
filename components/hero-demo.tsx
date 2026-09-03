@@ -5,6 +5,8 @@ import { Pause, Play, RotateCcw } from "lucide-react";
 import { Zeenat, type ZeenatHandle, type ZeenatIntensity, type ZeenatMotionMode } from "zeenat";
 
 const presets = [
+  ["bunting", "Country flag bunting"],
+  ["pakistan-independence-day", "Pakistan Independence Day"],
   ["winter", "Winter"],
   ["spring", "Spring"],
   ["autumn", "Autumn"],
@@ -14,7 +16,7 @@ const presets = [
 ] as const;
 
 export function HeroDemo() {
-  const [preset, setPreset] = useState<(typeof presets)[number][0]>("winter");
+  const [preset, setPreset] = useState<(typeof presets)[number][0]>("bunting");
   const [intensity, setIntensity] = useState<ZeenatIntensity>("medium");
   const [motion, setMotion] = useState<ZeenatMotionMode>("system");
   const [paused, setPaused] = useState(false);
@@ -33,6 +35,7 @@ export function HeroDemo() {
         key={`${preset}-${instance}`}
         ref={ref}
         preset={preset}
+        {...(preset === "bunting" ? { flag: "pakistan" as const } : {})}
         intensity={intensity}
         motion={motion}
         seed={271828}

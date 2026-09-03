@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { allIndexablePaths, SITE_URL } from "@/lib/content";
 
 export function buildSitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date("2026-08-25T00:00:00.000Z");
+  const lastModified = new Date("2026-09-03T00:00:00.000Z");
   return allIndexablePaths.map((path) => ({
     url: `${SITE_URL}${path}`,
     lastModified,

@@ -4,9 +4,9 @@ import { useState } from "react";
 import { Check, Copy } from "lucide-react";
 
 const examples = {
-  React: 'import { Zeenat } from "zeenat";\n\nexport function App() {\n  return <Zeenat preset="winter" />;\n}',
-  "Next.js": 'import { Zeenat } from "zeenat";\n\nexport default function RootLayout({ children }) {\n  return <body><Zeenat preset="winter" />{children}</body>;\n}',
-  Vanilla: 'import { zeenat } from "zeenat/vanilla";\n\nconst decoration = zeenat({ preset: "winter" });\n// decoration.destroy();',
+  React: 'import { Zeenat } from "zeenat";\n\nexport function App() {\n  return <Zeenat preset="bunting" flag="pakistan" />;\n}',
+  "Next.js": 'import { Zeenat } from "zeenat";\n\nexport default function RootLayout({ children }: { children: React.ReactNode }) {\n  return <html><body><Zeenat preset="bunting" flag="pakistan" />{children}</body></html>;\n}',
+  Vanilla: 'import { zeenat } from "zeenat/vanilla";\n\nconst decoration = zeenat({ preset: "bunting", flag: "pakistan" });\n// decoration.destroy();',
 } as const;
 
 export function HomeCodeTabs() {

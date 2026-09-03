@@ -6,7 +6,7 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { CodeBlock } from "@/components/code-block";
 import { JsonLd } from "@/components/json-ld";
 import { LiveDemo } from "@/components/live-demo";
-import { effects, getEffect } from "@/lib/content";
+import { effects, getEffect, VERSION } from "@/lib/content";
 import { articleJsonLd, breadcrumbJsonLd, pageMetadata } from "@/lib/seo";
 import { DocPagination } from "@/components/doc-pagination";
 
@@ -33,7 +33,7 @@ export default async function EffectPage({ params }: { params: Promise<{ effect:
       <LiveDemo effect={effect.slug} label={effect.title} />
       <div className="article-columns">
         <article className="prose">
-          <section id="imports"><h2>Installation and imports</h2><p>Install Zeenat once, then use the aggregate effects entry or the smallest explicit subpath. Both paths are exported by package version 0.2.1.</p><CodeBlock language="bash" label="Install" code="npm install zeenat" /><CodeBlock language="ts" label="Imports" code={`import { ${effect.exportName} } from "zeenat/effects";\n// or\nimport { ${effect.exportName} } from "zeenat/effects/${subpath}";`} /></section>
+          <section id="imports"><h2>Installation and imports</h2><p>Install Zeenat once, then use the aggregate effects entry or the smallest explicit subpath. Both paths are exported by package version {VERSION}.</p><CodeBlock language="bash" label="Install" code="npm install zeenat" /><CodeBlock language="ts" label="Imports" code={`import { ${effect.exportName} } from "zeenat/effects";\n// or\nimport { ${effect.exportName} } from "zeenat/effects/${subpath}";`} />{slug === "bunting" && <p>Use <code>flags</code> for country artwork, or <code>colors</code> with an optional <code>shape</code> for classic pennants. These modes are mutually exclusive. See <Link href="/docs/flags">country flags and custom artwork</Link> for the catalog and public render contracts, or use the <Link href="/docs/presets/bunting">one-line bunting preset</Link>.</p>}</section>
           <section id="usage"><h2>Basic usage</h2><CodeBlock {...effect.examples[0]!} /></section>
           <section id="api"><h2>{effect.exportName}() options</h2><p>Properties marked required have no factory default. Every other value below is taken from the current TypeScript source.</p><div className="api-table-wrap"><table className="api-table"><thead><tr><th>Property</th><th>Type</th><th>Required</th><th>Default</th><th>Description</th></tr></thead><tbody>{effect.options.map((option) => <tr key={option.name}><th scope="row"><code>{option.name}</code></th><td><code>{option.type}</code></td><td>{option.required ? "Yes" : "No"}</td><td><code>{option.default}</code></td><td>{option.description}</td></tr>)}</tbody></table></div></section>
           <section id="examples"><h2>Examples</h2>{effect.examples.slice(1).map((example) => <div className="example" key={example.label}><h3>{example.label}</h3><CodeBlock {...example} /></div>)}</section>

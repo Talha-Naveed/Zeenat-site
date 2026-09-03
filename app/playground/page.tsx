@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Playground } from "@/components/playground";
 import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = pageMetadata({ title: "Interactive Playground", description: "Preview every Zeenat.js preset and effect, adjust intensity, seed and motion, control the scene, and copy working React or vanilla code.", path: "/playground", type: "website" });
+export const metadata: Metadata = pageMetadata({ title: "Interactive Playground", description: "Preview eight Zeenat.js presets and nine effects, choose from 249 country flags, adjust orientation and motion, and copy React or vanilla code.", path: "/playground", type: "website" });
 
 export default function PlaygroundPage() {
   return (

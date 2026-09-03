@@ -1,4 +1,4 @@
-import { GITHUB_URL, NPM_URL, SITE_URL, effects, presets } from "@/lib/content";
+import { GITHUB_URL, NPM_URL, SITE_URL, VERSION, effects, presets } from "@/lib/content";
 
 export const dynamic = "force-static";
 
@@ -12,12 +12,14 @@ export function GET() {
 - GitHub repository: ${GITHUB_URL}
 - npm package: ${NPM_URL}
 - Install: npm install zeenat
+- Version: ${VERSION}
 - React: ${SITE_URL}/docs/react
 - Next.js App Router: ${SITE_URL}/docs/nextjs
 - Vanilla JavaScript: ${SITE_URL}/docs/vanilla
 - Effects: ${SITE_URL}/docs/effects (${effects.map((effect) => effect.title).join(", ")})
 - Presets: ${SITE_URL}/docs/presets (${presets.map((preset) => preset.title).join(", ")})
 - API reference: ${SITE_URL}/docs/api
+- Country flags: ${SITE_URL}/docs/flags (249 entries; bunting requires flag; horizontal or vertical orientation)
 - Playground: ${SITE_URL}/playground
 - Changelog: ${SITE_URL}/changelog
 - Contributing: ${GITHUB_URL}/blob/main/CONTRIBUTING.md
