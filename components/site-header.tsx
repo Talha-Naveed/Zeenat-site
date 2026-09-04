@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Github, Menu } from "lucide-react";
+import { BrandLogo } from "@/components/brand-logo";
 import { DocsSearch } from "@/components/docs-search";
 import { searchIndex } from "@/lib/content";
 
@@ -7,9 +8,8 @@ export function SiteHeader() {
   return (
     <header className="site-header">
       <div className="shell nav-shell">
-        <Link href="/" className="brand" aria-label="Zeenat.js home">
-          <span className="brand-mark" aria-hidden="true">Z</span>
-          <span>Zeenat.js</span>
+        <Link href="/" className="brand brand-logo-link" aria-label="Zeenat.js home">
+          <BrandLogo className="header-brand-logo" priority />
         </Link>
         <nav aria-label="Primary navigation">
           <Link href="/docs">Docs</Link>

@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { hydrateRoot } from "react-dom/client";
 import { describe, expect, it, vi } from "vitest";
@@ -8,6 +8,7 @@ import { CopyButton } from "@/components/copy-button";
 import { DocsSearch } from "@/components/docs-search";
 import { playgroundCode } from "@/components/playground";
 import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 import { HomeCodeTabs } from "@/components/home-code-tabs";
 import { allIndexablePaths, effects, presets, searchIndex, SITE_URL } from "@/lib/content";
 
@@ -76,6 +77,14 @@ describe("interactive utilities", () => {
     const mobileNavigation = screen.getByRole("navigation", { name: "Mobile navigation" });
     expect(mobileNavigation.querySelector('a[href="/docs"]')).toBeInTheDocument();
     expect(mobileNavigation.querySelector('a[href="/playground"]')).toBeInTheDocument();
+  });
+
+  it("uses the supplied branding and exposes a dedicated footer sitemap", () => {
+    const { container } = render(<SiteFooter />);
+    expect(within(container).getByAltText("Zeenat")).toHaveAttribute("src", "/brand/zeenat-logo.svg");
+    const sitemap = within(container).getByRole("navigation", { name: "Sitemap" });
+    expect(within(sitemap).getByRole("link", { name: "Documentation" })).toHaveAttribute("href", "/docs");
+    expect(within(sitemap).getByRole("link", { name: "Changelog" })).toHaveAttribute("href", "/changelog");
   });
 
   it("hydrates the interactive code tabs without a mismatch", async () => {
