@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-The site consumes the published `zeenat@0.3.0` package. The docs and playground cover nine effects, eight preset IDs, the 249-entry country flag catalog, horizontal and vertical flags, and custom artwork contracts. The displayed version comes from the installed package. The central registry in `lib/content.ts` drives routes, documentation search, internal links, sitemap entries and the LLM discovery indexes.
+The site consumes the published `zeenat@0.3.1` package. The docs and playground cover nine effects, eight preset IDs, the 249-entry country flag catalog, horizontal and vertical flags, custom artwork contracts, and navbar-aware top bunting. The displayed version comes from the installed package. The central registry in `lib/content.ts` drives routes, documentation search, internal links, sitemap entries and the LLM discovery indexes.
 
 ## Verification
 
