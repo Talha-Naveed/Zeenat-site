@@ -2,14 +2,14 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { flagCatalog } from "zeenat/flags";
 import { parseChangelog } from "@/lib/changelog-parser";
-import { allIndexablePaths, searchIndex, VERSION } from "@/lib/content";
+import { allIndexablePaths, getDocArticle, searchIndex, VERSION } from "@/lib/content";
 import { playgroundCode } from "@/components/playground";
 
 const options = { intensity: "medium", motion: "system", seed: 42, count: 12, color: "#ffffff", variant: "flags", flag: "JP", orientation: "vertical" } as const;
 
-describe("0.3.0 release integration", () => {
-  it("indexes the new documentation and uses the installed package version", () => {
-    expect(VERSION).toBe("0.3.0");
+describe("0.3.1 release integration", () => {
+  it("indexes the documentation and uses the installed package version", () => {
+    expect(VERSION).toBe("0.3.1");
     for (const path of ["/docs/flags", "/docs/presets/bunting", "/docs/presets/pakistan-independence-day"]) {
       expect(allIndexablePaths).toContain(path);
       expect(searchIndex.some((item) => item.href === path)).toBe(true);
@@ -23,10 +23,24 @@ describe("0.3.0 release integration", () => {
     const releases = parseChangelog(readFileSync("node_modules/zeenat/CHANGELOG.md", "utf8"));
     expect(releases[0]?.version).toBe(VERSION);
     expect(releases[0]?.date).toBeUndefined();
-    expect(releases[1]?.date).toBe("2026-08-25");
+    expect(releases[1]?.version).toBe("0.3.0");
+    expect(releases[2]?.date).toBe("2026-08-25");
     const added = releases[0]?.groups.find((group) => group.title === "Added")?.items;
-    expect(added).toContain("A locally packaged 249-entry country/territory catalog (excluding IL, plus XK), lazy SVG geometry, `zeenat/flags`, and `createBuntingPreset`.");
-    expect(releases[0]?.groups.find((group) => group.title === "Fixed")?.items).toContain("Bunting recalculates in viewport pixels on resize, keeps each item tangent to the cord, and preserves country-flag proportions across responsive screens.");
+    expect(added).toContain('React and vanilla `navbar` option: `"auto"` by default, a CSS selector for custom layouts, or `false` to retain viewport-top placement. Bottom bunting and other effects keep their existing positions.');
+    expect(releases[0]?.groups.find((group) => group.title === "Fixed")?.items).toContain("Top bunting now sits below the visible bottom of common site headers and navigation. It stays visible at the viewport top when navigation scrolls or slides away, and follows it back on reveal.");
+    const previousAdded = releases[1]?.groups.find((group) => group.title === "Added")?.items;
+    expect(previousAdded).toContain("A locally packaged 249-entry country/territory catalog (excluding IL, plus XK), lazy SVG geometry, `zeenat/flags`, and `createBuntingPreset`.");
+    expect(releases[1]?.groups.find((group) => group.title === "Fixed")?.items).toContain("Bunting recalculates in viewport pixels on resize, keeps each item tangent to the cord, and preserves country-flag proportions across responsive screens.");
+  });
+
+  it("documents automatic, custom, and disabled navbar placement", () => {
+    const article = getDocArticle("configuration");
+    const navbar = article?.sections.find((section) => section.id === "navbar");
+    expect(article?.description).toContain("bunting navigation placement");
+    expect(article?.sections.find((section) => section.id === "options")?.code?.code).toContain("navbar?: string | false");
+    expect(navbar?.paragraphs.join(" ")).toContain("navbar=\"auto\"");
+    expect(navbar?.code?.code).toContain('navbar="#site-header"');
+    expect(navbar?.code?.code).toContain("navbar: false");
   });
 });
 

@@ -21,7 +21,7 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "shiki": "^3.12.2",
-    "zeenat": "0.3.0"
+    "zeenat": "0.3.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
